@@ -1,0 +1,34 @@
+volumes:
+  postgres_volume:
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  postgres-link-shortener:
+    image: postgres:latest
+    container_name: postgres-ls
+    networks:
+      - app-network
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: mentoring
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: s9td3ixh
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+  link-shortener:
+    depends_on:
+      - postgres-link-shortener
+    build: ..
+    container_name: link-shortener
+    networks:
+      - app-network
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
